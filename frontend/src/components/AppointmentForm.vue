@@ -19,6 +19,12 @@
         <label for="date">Data:</label>
         <input id="date" type="date" v-model="form.date" required />
 
+        <label for="timeInterval">Interval orar:</label>
+        <input id="timeInterval" v-model="form.timeInterval" placeholder="Ex: 10:00-12:00" required />
+
+        <label for="phone">Telefon:</label>
+        <input id="phone" type="tel" v-model="form.phone" placeholder="Introduceți numărul de telefon" required />
+
         <button type="submit">Trimite</button>
         </form>
     </div>
@@ -40,6 +46,8 @@ export default {
       pet: '',
       service: '',
       date: '',
+      timeInterval: '',
+      phone: ''
     });
 
     const submitForm = () => {

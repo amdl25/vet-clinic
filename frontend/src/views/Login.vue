@@ -30,35 +30,38 @@
 </template>
 
 <script>
-import { useStore } from 'vuex';
-import { ref } from 'vue';
+import {firebaseApp }from "../config/firebaseConfig";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 export default {
-  name: 'LoginView',
-  setup() {
-    const store = useStore();
-    const email = ref('');
-    const password = ref('');
-    const errorMessage = ref('');
-
-    const login = () => {
-      if (email.value === 'admin@gmail.com' && password.value === 'password') {
-        const user = { email: email.value, id: 1 };
-        store.commit('setUser', user);
-        errorMessage.value = '';
-        alert('Autentificare reușită!');
-      } else {
-        errorMessage.value = 'Nume de utilizator sau parolă incorectă';
-      }
-    };
-
+  name: "Login",
+  data() {
     return {
-      email,
-      password,
-      errorMessage,
-      login,
+      email: "",
+      password: "",
+      errorMessage: ""
     };
+  },
+  methods: {
+    async login() {
+      const auth = getAuth(firebaseApp);
+      try {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          this.email,
+          this.password
+        );
+
+        console.log("Utilizator autentificat:", userCredential.user);
+        alert("Autentificare reușită! Redirecționare către pagina principală.");
+        this.$router.push("/");
+      } catch (error) {
+        console.error("Eroare la autentificare:", error.message);
+        this.errorMessage = "Eroare: " + error.message;
+      }
+    },
   },
 };
 </script>
+
 

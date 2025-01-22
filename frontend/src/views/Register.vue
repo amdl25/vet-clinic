@@ -2,12 +2,12 @@
   <div class="form-container">
     <h1>Creați un cont</h1>
     <form @submit.prevent="register">
-      <label for="username">Nume de utilizator:</label>
+      <label for="username">Nume și prenume:</label>
       <input
         id="username"
         type="text"
         v-model="username"
-        placeholder="Introduceți numele de utilizator"
+        placeholder="Introduceți numele și prenumele"
         required
       />
 
@@ -20,6 +20,15 @@
         required
       />
 
+      <label for="phone">Telefon:</label>
+      <input
+        id="phone"
+        type="tel"
+        v-model="phone"
+        placeholder="Introduceți numărul de telefon"
+        required
+      />
+
       <label for="password">Parolă:</label>
       <input
         id="password"
@@ -29,7 +38,7 @@
         required
       />
 
-      <button type="submit">Creați contul</button>
+      <button type="submit">Înregistrare</button>
     </form>
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     <p>
@@ -39,35 +48,57 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import  {firebaseApp } from "../config/firebaseConfig";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 export default {
-  name: 'RegisterView',
-  setup() {
-    const username = ref('');
-    const email = ref('');
-    const password = ref('');
-    const errorMessage = ref('');
-
-    const register = () => {
-      if (username.value && email.value && password.value) {
-        alert('Cont creat cu succes!');
-        errorMessage.value = '';
-      } else {
-        errorMessage.value = 'Toate câmpurile sunt obligatorii.';
-      }
-    };
-
+  name: "Register",
+  data() {
     return {
-      username,
-      email,
-      password,
-      errorMessage,
-      register,
+      username: "",
+      email: "",
+      phone: "",
+      password: "",
+      errorMessage: ""
     };
+  },
+  methods: {
+    async register() {
+      const auth = getAuth(firebaseApp);
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          this.email,
+          this.password
+        );
+
+        const user = userCredential.user;
+
+        await updateProfile(user, {
+          displayName: this.username,
+        });
+
+        console.log("Utilizator înregistrat:", user);
+
+      
+      this.$store.dispatch("saveUserToDatabase", {
+        uid: user.uid,
+        name: this.username,
+        email: this.email,
+        phone: this.phone
+      });
+
+        alert("Înregistrare reușită");
+        this.$router.push("/");
+      } catch (error) {
+        console.error("Eroare la înregistrare:", error.message);
+        this.errorMessage = "Eroare: " + error.message;
+      }
+    },
   },
 };
 </script>
+
 
 <style scoped>
 .form-container{
