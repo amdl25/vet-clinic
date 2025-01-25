@@ -1,10 +1,10 @@
-import { createStore } from "vuex";
-import { firebaseApp } from "../config/firebaseConfig";
+import axios from 'axios';
+import { createStore } from 'vuex';
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { getServices } from "../config/firestoreServices";
-import { createAppointment } from "../config/firestoreServices";
-import { saveUser } from "../config/firestoreServices";
 
+import firebaseConfig from '../../../db_config/firebaseConfig.js';
+
+const { firebaseApp } = firebaseConfig;
 
 export const store = createStore({
   state: {
@@ -36,6 +36,7 @@ export const store = createStore({
         console.error("Error in initializeAuth:", error.message);
       }
     },
+
     async logout({ commit }) {
       const auth = getAuth(firebaseApp);
       try {
@@ -45,26 +46,29 @@ export const store = createStore({
         console.error("Eroare la delogare:", error.message);
       }
     },
+
     async fetchServices({ commit }) {
       try {
-        const services = await getServices();
-        commit("setServices", services);
+        const response = await axios.get('http://localhost:3000/api/services');
+        commit('setServices', response.data);
       } catch (error) {
-        console.error("Eroare la obținerea serviciilor:", error);
+        console.error('Eroare la obținerea serviciilor:', error);
       }
     },
+
     async addAppointment(_, appointment) {
       try {
-        await createAppointment(appointment);
-        console.log("Programarea a fost creată cu succes:", appointment);
+        const response = await axios.post('http://localhost:3000/api/appointments', appointment);
+        console.log('Programarea a fost creată:', response.data);
       } catch (error) {
-        console.error("Eroare la crearea programării:", error.message);
+        console.error('Eroare la adăugarea programării:', error);
       }
     },
+
     async saveUserToDatabase(_, user) {
       try {
-        await saveUser(user);
-        console.log("Utilizator salvat în baza de date:", user);
+        const response = await axios.post('http://localhost:3000/api/users', user);
+        console.log("Utilizator salvat în baza de date:", response.data);
       } catch (error) {
         console.error("Eroare la salvarea utilizatorului în baza de date:", error.message);
       }
@@ -82,4 +86,3 @@ export const store = createStore({
     },
   },
 });
-

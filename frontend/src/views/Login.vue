@@ -30,8 +30,12 @@
 </template>
 
 <script>
-import {firebaseApp }from "../config/firebaseConfig";
+import firebaseConfig from '../../../db_config/firebaseConfig.js';
+
+const { firebaseApp } = firebaseConfig;
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { mapMutations } from "vuex";
+
 
 export default {
   name: "Login",
@@ -39,10 +43,12 @@ export default {
     return {
       email: "",
       password: "",
-      errorMessage: ""
+      errorMessage: "",
     };
   },
   methods: {
+    ...mapMutations(["setUser"]),
+
     async login() {
       const auth = getAuth(firebaseApp);
       try {
@@ -51,8 +57,14 @@ export default {
           this.email,
           this.password
         );
+        
+        const user = userCredential.user;
 
-        console.log("Utilizator autentificat:", userCredential.user);
+        console.log("Utilizator autentificat:", user);
+        
+       
+        this.setUser(user);
+
         alert("Autentificare reușită! Redirecționare către pagina principală.");
         this.$router.push("/");
       } catch (error) {
@@ -64,4 +76,8 @@ export default {
 };
 </script>
 
-
+<style scoped>
+.form-container {
+  margin-bottom: 100px;
+}
+</style>

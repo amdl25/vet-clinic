@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import AppointmentForm from '../components/AppointmentForm.vue';
 
 export default {
@@ -22,9 +23,16 @@ export default {
     };
   },
   methods: {
-    handleAppointment(appointment) {
-      this.submittedAppointment = appointment;
-      console.log('Programare primită:', appointment);
+    ...mapActions(["addAppointment"]),
+
+    async handleAppointment(appointment) {
+      try {
+        await this.addAppointment(appointment);
+        this.submittedAppointment = appointment;
+        console.log('Programare primită:', appointment);
+      } catch (error) {
+        console.error('Eroare la trimiterea programării:', error);
+      }
     },
   },
 };

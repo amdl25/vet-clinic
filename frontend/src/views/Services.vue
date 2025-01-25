@@ -1,30 +1,63 @@
 <template>
-  <div>
-    <h1>Servicii</h1>
-    <ul>
-      <li v-for="service in services" :key="service.id">{{ service.name }}</li>
-    </ul>
+  <div class="services-container">
+    <h1>Servicii Veterinare</h1>
+    <div class="service-list">
+      <ServiceCard 
+        v-for="service in services" 
+        :key="service.id" 
+        :service="service" />
+    </div>
   </div>
 </template>
 
 <script>
-import { useStore } from 'vuex';
-import { computed, onMounted } from 'vue';
+import { mapGetters, mapActions } from 'vuex';
+import ServiceCard from '../components/ServiceCard.vue';
 
 export default {
-  name: 'Services',
-  setup() {
-    const store = useStore();
-
-    const services = computed(() => store.getters.getServices);
-
-    onMounted(() => {
-      if (!services.value.length) {
-        store.dispatch('fetchServices');
+  components: {
+    ServiceCard
+  },
+  data() {
+    return {
+      services: [],
+    };
+  },
+  computed: {
+    ...mapGetters(["getServices"]),
+  },
+  created() {
+    this.loadServices();
+  },
+  methods: {
+    ...mapActions(["fetchServices"]),
+    
+    async loadServices() {
+      try {
+        await this.fetchServices(); 
+        this.services = this.getServices;
+      } catch (error) {
+        console.error('Eroare la obținerea serviciilor:', error);
       }
-    });
-
-    return { services };
+    }
   },
 };
 </script>
+
+<style scoped>
+.services-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  padding: 20px;
+}
+
+.service-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 50px;
+}
+</style>

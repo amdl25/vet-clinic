@@ -48,7 +48,9 @@
 </template>
 
 <script>
-import  {firebaseApp } from "../config/firebaseConfig";
+import firebaseConfig from '../../../db_config/firebaseConfig.js';
+
+const { firebaseApp } = firebaseConfig;
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 export default {
@@ -74,19 +76,20 @@ export default {
 
         const user = userCredential.user;
 
+       
         await updateProfile(user, {
           displayName: this.username,
         });
 
         console.log("Utilizator înregistrat:", user);
 
-      
-      this.$store.dispatch("saveUserToDatabase", {
-        uid: user.uid,
-        name: this.username,
-        email: this.email,
-        phone: this.phone
-      });
+        
+        this.$store.dispatch("saveUserToDatabase", {
+          uid: user.uid,
+          name: this.username,
+          email: this.email,
+          phone: this.phone
+        });
 
         alert("Înregistrare reușită");
         this.$router.push("/");
@@ -99,10 +102,8 @@ export default {
 };
 </script>
 
-
 <style scoped>
-.form-container{
-    margin-bottom: 100px;
+.form-container {
+  margin-bottom: 100px;
 }
 </style>
-
