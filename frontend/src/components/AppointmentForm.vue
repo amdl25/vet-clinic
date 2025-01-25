@@ -9,9 +9,9 @@
       <input id="pet" v-model="form.pet" placeholder="Ex: Câine, Pisică" required />
 
       <label for="service">Serviciu:</label>
-      <select id="service" v-model="form.service" required>
+      <select id="service" v-model="form.serviceId" required>
         <option value="" disabled selected>Selectați un serviciu</option>
-        <option v-for="service in services" :key="service.id" :value="service.name">
+        <option v-for="service in services" :key="service.id" :value="service.id">
           {{ service.name }}
         </option>
       </select>
@@ -40,11 +40,12 @@ export default {
     const store = useStore();
 
     const services = computed(() => store.getters.getServices);
+    const user = computed(() => store.getters.getUser);  // Obținem utilizatorul autentificat
 
     const form = reactive({
       name: '',
       pet: '',
-      service: '',
+      serviceId: '',  // Vom folosi ID-ul serviciului
       date: '',
       timeInterval: '',
       phone: ''
@@ -52,7 +53,11 @@ export default {
 
     const submitForm = async () => {
       try {
-        await store.dispatch('addAppointment', { ...form });
+        const appointmentData = {
+          ...form,
+          userId: user.value ? user.value.uid : null, // Adăugăm userId doar dacă utilizatorul este autentificat
+        };
+        await store.dispatch('addAppointment', appointmentData);
         alert('Programarea a fost trimisă cu succes!');
       } catch (error) {
         console.error('Eroare la trimiterea programării:', error);
