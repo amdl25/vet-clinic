@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { createStore } from 'vuex';
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut, getIdToken } from "firebase/auth";
 
 import firebaseConfig from '../../../db_config/firebaseConfig.js';
 
@@ -56,9 +56,13 @@ export const store = createStore({
       }
     },
 
-    async addAppointment(_, appointment) {
+    async addAppointment(_, { appointmentData, token }) {
       try {
-        const response = await axios.post('http://localhost:3000/api/appointments', appointment);
+        const response = await axios.post('http://localhost:3000/api/appointments', appointmentData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         console.log('Programarea a fost creată:', response.data);
       } catch (error) {
         console.error('Eroare la adăugarea programării:', error);
@@ -67,7 +71,11 @@ export const store = createStore({
 
     async saveUserToDatabase(_, user) {
       try {
-        const response = await axios.post('http://localhost:3000/api/users', user);
+        const response = await axios.post('http://localhost:3000/api/users', user, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
         console.log("Utilizator salvat în baza de date:", response.data);
       } catch (error) {
         console.error("Eroare la salvarea utilizatorului în baza de date:", error.message);

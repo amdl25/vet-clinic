@@ -1,20 +1,17 @@
-import firebaseConfig from '../../db_config/firebaseConfig.js';
-const { db } = firebaseConfig;
-
-import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../db_config/firebaseSDK.js';
 
 const getServices = async (req, res) => {
-  try {
-    const servicesCollection = collection(db, 'services');
-    const querySnapshot = await getDocs(servicesCollection);
-    const services = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    res.json(services);
-  } catch (error) {
-    res.status(500).json({ message: 'Eroare la obținerea serviciilor', error });
-  }
+    try {
+      const snapshot = await db.collection('services').get();
+      const services = [];
+      snapshot.forEach(doc => {
+        services.push({ id: doc.id, ...doc.data() });
+      });
+      return res.json(services);
+    } catch (error) {
+      console.error('Eroare la obținerea serviciilor:', error);
+      return res.status(500).json({ message: 'Eroare la obținerea serviciilor', error });
+    }
 };
 
-export { getServices };
+export {getServices};

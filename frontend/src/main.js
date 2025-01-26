@@ -1,11 +1,22 @@
-import './style.css'
+import './style.css';
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 import { store } from './store';
 
-const app = createApp(App);
+async function init() {
+  try {
+    await store.dispatch('fetchServices');
+    console.log('Serviciile au fost încărcate!');
+  } catch (error) {
+    console.error('Eroare la încărcarea serviciilor:', error);
+  }
 
-app.use(router);
-app.use(store);
-app.mount('#app');
+  const app = createApp(App);
+
+  app.use(router);
+  app.use(store);
+  app.mount('#app');
+}
+
+init();

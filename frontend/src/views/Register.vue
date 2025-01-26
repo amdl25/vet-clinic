@@ -49,9 +49,9 @@
 
 <script>
 import firebaseConfig from '../../../db_config/firebaseConfig.js';
-
 const { firebaseApp } = firebaseConfig;
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile, getIdToken, signOut } from "firebase/auth";
+import { mapActions } from "vuex";
 
 export default {
   name: "Register",
@@ -61,46 +61,45 @@ export default {
       email: "",
       phone: "",
       password: "",
-      errorMessage: ""
+      errorMessage: "",
     };
   },
   methods: {
     async register() {
       const auth = getAuth(firebaseApp);
       try {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          this.email,
-          this.password
-        );
-
+        const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
         const user = userCredential.user;
 
-       
-        await updateProfile(user, {
-          displayName: this.username,
-        });
-
+        await updateProfile(user, { displayName: this.username });
         console.log("Utilizator înregistrat:", user);
 
-        
-        this.$store.dispatch("saveUserToDatabase", {
+        const token = await getIdToken(user);
+        console.log("Token de autentificare:", token);
+
+        await this.$store.dispatch("saveUserToDatabase", {
           uid: user.uid,
           name: this.username,
           email: this.email,
-          phone: this.phone
+          phone: this.phone,
+          appointments: [],
+          token: token,
         });
 
-        alert("Înregistrare reușită");
-        this.$router.push("/");
-      } catch (error) {
-        console.error("Eroare la înregistrare:", error.message);
-        this.errorMessage = "Eroare: " + error.message;
-      }
+        await signOut(auth);
+        console.log("Utilizator delogat după înregistrare");
+
+        alert("Înregistrare reușită! Vă rugăm să vă autentificați pentru a continua.");
+        this.$router.push("/login");
+        } catch (error) {
+          console.error("Eroare la înregistrare:", error.message);
+          this.errorMessage = "Eroare: " + error.message;
+        }
+      },
     },
-  },
-};
+  };
 </script>
+
 
 <style scoped>
 .form-container {

@@ -1,5 +1,1 @@
-{ "type": "module",
-  "dependencies": {
-    "firebase": "^11.2.0"
-  }
-}
+{"type":"module","dependencies":{"firebase":"^11.2.0","firebase-admin":"^13.0.2"}}

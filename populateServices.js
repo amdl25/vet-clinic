@@ -1,6 +1,4 @@
-import { collection, addDoc } from 'firebase/firestore';
-import firebaseConfig from './db_config/firebaseConfig.js';
-const { db } = firebaseConfig;
+import { db } from './db_config/firebaseSDK.js';
 
 
 const services = [
@@ -64,14 +62,14 @@ const services = [
   
 
 const addServices = async () => {
-  for (const service of services) {
-    try {
-      await addDoc(collection(db, 'services'), service);
-      console.log(`Serviciu adăugat: ${service.name}`);
-    } catch (error) {
-      console.error('Eroare la adăugarea serviciului:', error);
-    }
-  }
+    for (const service of services) {
+        try {
+          await db.collection('services').add(service);
+          console.log(`Serviciu adăugat: ${service.name}`);
+        } catch (error) {
+          console.error('Eroare la adăugarea serviciului:', error);
+        }
+      }
 };
 
 addServices();

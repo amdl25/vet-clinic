@@ -20,7 +20,11 @@
       <input id="date" type="date" v-model="form.date" required />
 
       <label for="timeInterval">Interval orar:</label>
-      <input id="timeInterval" v-model="form.timeInterval" placeholder="Ex: 10:00-12:00" required />
+      <select id="timeInterval" v-model="form.timeInterval" required>
+        <option value="" disabled selected>Selectați un interval orar</option>
+        <option value="09:00-15:00">09:00-15:00</option>
+        <option value="15:00-20:00">15:00-20:00</option>
+      </select>
 
       <label for="phone">Telefon:</label>
       <input id="phone" type="tel" v-model="form.phone" placeholder="Introduceți numărul de telefon" required />
@@ -40,12 +44,12 @@ export default {
     const store = useStore();
 
     const services = computed(() => store.getters.getServices);
-    const user = computed(() => store.getters.getUser);  // Obținem utilizatorul autentificat
+    const user = computed(() => store.getters.getUser);
 
     const form = reactive({
       name: '',
       pet: '',
-      serviceId: '',  // Vom folosi ID-ul serviciului
+      serviceId: '',
       date: '',
       timeInterval: '',
       phone: ''
@@ -53,11 +57,12 @@ export default {
 
     const submitForm = async () => {
       try {
+        const token = user.value.token; 
         const appointmentData = {
           ...form,
-          userId: user.value ? user.value.uid : null, // Adăugăm userId doar dacă utilizatorul este autentificat
+          userId: user.value ? user.value.uid : null,
         };
-        await store.dispatch('addAppointment', appointmentData);
+        await store.dispatch('addAppointment', { appointmentData, token });
         alert('Programarea a fost trimisă cu succes!');
       } catch (error) {
         console.error('Eroare la trimiterea programării:', error);

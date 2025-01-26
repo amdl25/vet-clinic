@@ -1,44 +1,51 @@
-import firebaseConfig from '../../db_config/firebaseConfig.js';
-const { db } = firebaseConfig;
-
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { db } from '../../db_config/firebaseSDK.js';
+import { addAppointmentToUser } from './usersController.js';
 
 const createAppointment = async (req, res) => {
-    const { userId, name, pet, serviceId, date, timeInterval, phone } = req.body;
     try {
-      const appointmentRef = await addDoc(collection(db, 'appointments'), {
-        userId,
-        name,
-        pet,
-        serviceId,
-        date,
-        timeInterval,
-        phone,
-        status: 'pending',
-        metadata: {
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      });
-      res.status(201).json({ message: 'Programare adăugată', appointmentId: appointmentRef.id });
-    } catch (error) {
-      res.status(500).json({ message: 'Eroare la crearea programării', error });
-    }
-
+        const { name, pet, serviceId, date, timeInterval, phone } = req.body;
+    
+        const appointmentRef = await db.collection('appointments').add({
+          name,
+          pet,
+          serviceId,
+          date,
+          timeInterval,
+          phone,
+          status: 'pending',
+          metadata: {
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          userId: req.user ? req.user.uid : null,
+        });
+    
+        if (req.user) {
+          await addAppointmentToUser(req.user.uid, appointmentRef.id);
+        }
+    
+        return res.status(201).json({
+          message: 'Programare creată cu succes',
+          appointmentId: appointmentRef.id,
+        });
+      } catch (error) {
+        console.error('Eroare la crearea programării:', error);
+        return res.status(500).json({ message: 'Eroare la crearea programării', error });
+      }
 };
-
+  
 const getAppointments = async (req, res) => {
-  try {
-    const appointmentsCollection = collection(db, 'appointments');
-    const querySnapshot = await getDocs(appointmentsCollection);
-    const appointments = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    res.json(appointments);
-  } catch (error) {
-    res.status(500).json({ message: 'Eroare la obținerea programărilor', error });
-  }
+    try {
+        const snapshot = await db.collection('appointments').get();
+        const appointments = [];
+        snapshot.forEach(doc => {
+        appointments.push({ id: doc.id, ...doc.data() });
+        });
+        return res.json(appointments);
+    } catch (error) {
+        console.error('Eroare la obținerea programărilor:', error);
+        return res.status(500).json({ message: 'Eroare la obținerea programărilor', error });
+    }
 };
 
 export { createAppointment, getAppointments };

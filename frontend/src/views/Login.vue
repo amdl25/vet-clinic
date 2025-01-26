@@ -47,23 +47,18 @@ export default {
     };
   },
   methods: {
-    ...mapMutations(["setUser"]),
+     ...mapMutations(["setUser"]),
 
     async login() {
       const auth = getAuth(firebaseApp);
       try {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          this.email,
-          this.password
-        );
-        
+        const userCredential = await signInWithEmailAndPassword(auth, this.email, this.password);
         const user = userCredential.user;
 
-        console.log("Utilizator autentificat:", user);
-        
-       
-        this.setUser(user);
+        const token = await user.getIdToken();
+        console.log("Token obținut după autentificare:", token);
+
+        this.setUser({ ...user, token });
 
         alert("Autentificare reușită! Redirecționare către pagina principală.");
         this.$router.push("/");
