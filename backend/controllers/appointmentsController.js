@@ -36,12 +36,12 @@ const createAppointment = async (req, res) => {
   
 const getAppointments = async (req, res) => {
     try {
-        const snapshot = await db.collection('appointments').get();
+        const snapshot = await db.collection('appointments').where('userId', '==', req.user.uid).get();;
         const appointments = [];
         snapshot.forEach(doc => {
         appointments.push({ id: doc.id, ...doc.data() });
         });
-        return res.json(appointments);
+        return res.status(200).json(appointments);
     } catch (error) {
         console.error('Eroare la obținerea programărilor:', error);
         return res.status(500).json({ message: 'Eroare la obținerea programărilor', error });

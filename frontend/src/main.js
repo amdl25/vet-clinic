@@ -13,6 +13,7 @@ async function init() {
   }
 
   const app = createApp(App);
+  store.dispatch("initializeAuth");
 
   app.use(router);
   app.use(store);

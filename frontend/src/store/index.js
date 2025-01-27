@@ -24,17 +24,17 @@ export const store = createStore({
   },
   actions: {
     initializeAuth({ commit }) {
-      try {
-        console.log("FirebaseApp:", firebaseApp);
-        const auth = getAuth(firebaseApp);
-        console.log("Auth:", auth);
-        onAuthStateChanged(auth, (user) => {
-          console.log("User state changed:", user);
-          commit("setUser", user || null);
-        });
-      } catch (error) {
-        console.error("Error in initializeAuth:", error.message);
-      }
+      const auth = getAuth();
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const token = await user.getIdToken();
+          console.log("Utilizator autentificat:", user);
+          commit("setUser", { ...user, token });
+        } else {
+          console.log("Niciun utilizator autentificat.");
+          commit("logout");
+        }
+      });
     },
 
     async logout({ commit }) {
@@ -66,6 +66,27 @@ export const store = createStore({
         console.log('Programarea a fost creată:', response.data);
       } catch (error) {
         console.error('Eroare la adăugarea programării:', error);
+      }
+    },
+
+    async fetchAppointments({ state }) {
+      try {
+        const auth = getAuth(firebaseApp);
+        const user = auth.currentUser;
+        if (!user) throw new Error("Utilizator nelogat");
+
+        const token = await user.getIdToken();
+
+        const response = await axios.get("http://localhost:3000/api/appointments", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        return response.data;
+      } catch (error) {
+        console.error("Eroare la obținerea programărilor:", error);
+        throw error;
       }
     },
 
