@@ -30,12 +30,30 @@ export default {
 }
 
 .card h2 {
-  font-size: 1.2em;
   margin-bottom: 10px;
 }
 
-.card p {
-  font-size: 1em;
-  margin-bottom: 10px;
+
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  .card h2 {
+    font-size: 18px;
+  }
+}
+
+
+@media (min-width: 1024px) {
+  .card {
+    width: 400px;
+    margin: 20px;
+  }
+
+  .card h2 {
+    font-size: 20px;
+  }
 }
 </style>

@@ -35,48 +35,57 @@
 </template>
 
 <script>
-import { useStore } from 'vuex';
-import { reactive, computed } from 'vue';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'AppointmentForm',
-  setup() {
-    const store = useStore();
+  data() {
+    return {
+      form: {
+        name: "",
+        pet: "",
+        serviceId: "",
+        date: "",
+        timeInterval: "",
+        phone: "",
+      },
+    };
+  },
+  computed: {
+    ...mapGetters(["getServices", "getUser"]),
+  },
+  methods: {
+    ...mapActions(["addAppointment", "fetchAppointments", "showNotification"]),
 
-    const services = computed(() => store.getters.getServices);
-    const user = computed(() => store.getters.getUser);
-
-    const form = reactive({
-      name: '',
-      pet: '',
-      serviceId: '',
-      date: '',
-      timeInterval: '',
-      phone: ''
-    });
-
-    const submitForm = async () => {
+    async submitForm() {
       try {
-        const token = user.value.token; 
+        const token = this.getUser.token; 
         const appointmentData = {
-          ...form,
-          userId: user.value ? user.value.uid : null,
+          ...this.form,
+          userId: this.getUser ? this.getUser.uid : null,
         };
-        await store.dispatch('addAppointment', { appointmentData, token });
-        alert('Programarea a fost trimisă cu succes!');
+
+        await this.addAppointment({ appointmentData, token });
+        await this.fetchAppointments();
+        this.showNotification({
+          message: "Programarea a fost creată cu succes!",
+          type: "success",
+        });
       } catch (error) {
         console.error('Eroare la trimiterea programării:', error);
-        alert('A apărut o eroare la trimiterea programării.');
+        
+        this.showNotification({
+          message: `Eroare: ${error.message}`,
+          type: "error",
+        });
       }
-    };
-
-    return { form, services, submitForm };
+    }
   },
 };
 </script>
 
 <style scoped>
-.form-container {
-  margin-bottom: 100px;
-}
+  .form-container {
+    margin-bottom: 100px;
+  }
 </style>

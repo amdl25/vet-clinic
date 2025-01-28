@@ -31,14 +31,18 @@
 
 <script>
 import firebaseConfig from '../../../db_config/firebaseConfig.js';
-
 const { firebaseApp } = firebaseConfig;
+
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { mapMutations } from "vuex";
+import { mapMutations, mapActions } from "vuex";
+import Notification from "../components/Notification.vue";
 
 
 export default {
   name: "Login",
+  components: {
+    Notification,
+  },
   data() {
     return {
       email: "",
@@ -47,7 +51,8 @@ export default {
     };
   },
   methods: {
-     ...mapMutations(["setUser"]),
+    ...mapActions(["showNotification"]),
+    ...mapMutations(["setUser"]),
 
     async login() {
       const auth = getAuth(firebaseApp);
@@ -60,11 +65,25 @@ export default {
 
         this.setUser({ ...user, token });
 
-        alert("Autentificare reușită! Redirecționare către pagina principală.");
+        this.showNotification({
+          message: "Autentificare reușită!",
+          type: "success",
+        });
+
         this.$router.push("/");
       } catch (error) {
         console.error("Eroare la autentificare:", error.message);
-        this.errorMessage = "Eroare: " + error.message;
+
+        const errorMessages = {
+        "auth/invalid-credential": "Credențialele sunt invalide. Verificați email-ul și parola.",
+        };
+
+        const errorMessage = errorMessages[error.code] || "A apărut o eroare. Te rugăm să încerci din nou.";
+
+        this.showNotification({
+          message: errorMessage,
+          type: "error",
+        });
       }
     },
   },

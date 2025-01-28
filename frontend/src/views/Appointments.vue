@@ -1,11 +1,9 @@
 <template>
   <div>
     <p>Completează formularul pentru a face o programare.</p>
-    <AppointmentForm @submit-appointment="handleAppointment" />
-    <p v-if="submittedAppointment">
-      Programare trimisă: {{ submittedAppointment.name }} pentru {{ submittedAppointment.pet }} la {{ submittedAppointment.date }}
-    </p>
-    <h2>Istoricul programărilor</h2>
+    <AppointmentForm/>
+
+    <h2 v-if="isAuthenticated">Istoricul programărilor</h2>
     <div v-if="appointments.length === 0">
       <p>Nu aveți programări înregistrate.</p>
     </div>
@@ -28,6 +26,7 @@ import { mapActions, mapGetters } from 'vuex';
 import { watch } from 'vue';
 import AppointmentForm from '../components/AppointmentForm.vue';
 
+
 export default {
   name: 'Appointments',
   components: {
@@ -40,7 +39,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['isAuthenticated', 'getServices']),
+    ...mapGetters(['isAuthenticated', 'getServices', "appointments"]),
     getServiceName() {
       return (serviceId) => {
         const service = this.getServices.find((s) => s.id === serviceId);
@@ -49,17 +48,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["addAppointment", "fetchAppointments"]),
-
-    async handleAppointment(appointment) {
-      try {
-        await this.addAppointment(appointment);
-        this.submittedAppointment = appointment;
-        console.log('Programare primită:', appointment);
-      } catch (error) {
-        console.error('Eroare la trimiterea programării:', error);
-      }
-    },
+    ...mapActions(["fetchAppointments"]),
 
     async loadAppointments() {
       try {
@@ -91,8 +80,54 @@ export default {
 <style scoped>
 .appointments-history {
   margin-bottom: 80px;
+  padding: 10px;
+  list-style-type: none;
 }
+
 .appointment-item {
   margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .appointments-history {
+    padding: 5px;
+  }
+
+  .appointment-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+}
+
+
+@media (min-width: 1024px) {
+  .appointments-history {
+    max-width: 800px;
+    margin: 0 auto 80px auto;
+  }
+
+  .appointment-item {
+    margin-bottom: 25px;
+    padding: 20px;
+    font-size: 18px;
+  }
+
+  strong {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
 }
 </style>

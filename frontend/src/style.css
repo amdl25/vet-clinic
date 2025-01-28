@@ -94,8 +94,101 @@ h1, h2 {
   text-align: center;
 }
 
-p a{
+p {
   color: rgb(66, 13, 66);
   font-weight: 600;
   text-decoration: none;
+  margin-bottom: 10px;
+  line-height: 1.6;
 }
+
+@media (max-width: 768px) {
+  header {
+    font-size: 18px;
+    padding: 8px;
+  }
+
+  nav a {
+    margin: 0 10px;
+    font-size: 14px;
+  }
+
+  footer {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .form-container {
+    max-width: 60%;
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  h1,
+  h2 {
+    font-size: 20px;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    font-size: 18px;
+  }
+
+  header {
+    font-size: 24px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  nav a {
+    margin: 0 20px;
+    font-size: 18px;
+  }
+
+  footer {
+    font-size: 16px;
+    padding: 20px;
+  }
+
+  button {
+    font-size: 18px;
+    padding: 15px 20px;
+  }
+
+  .form-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    border: 2px solid #ddd;
+    box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  h1,
+  h2 {
+    font-size: 24px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 15px;
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 18px;
+    line-height: 1.8;
+  }
+}
+

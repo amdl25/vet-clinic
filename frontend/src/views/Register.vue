@@ -51,10 +51,14 @@
 import firebaseConfig from '../../../db_config/firebaseConfig.js';
 const { firebaseApp } = firebaseConfig;
 import { getAuth, createUserWithEmailAndPassword, updateProfile, getIdToken, signOut } from "firebase/auth";
-import { mapActions } from "vuex";
+import { mapActions, useStore } from "vuex";
+import Notification from "../components/Notification.vue"
 
 export default {
   name: "Register",
+  components: {
+    Notification,
+  },
   data() {
     return {
       username: "",
@@ -65,6 +69,7 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["showNotification"]),
     async register() {
       const auth = getAuth(firebaseApp);
       try {
@@ -86,14 +91,23 @@ export default {
           token: token,
         });
 
+        this.showNotification( {
+          message: "Înregistrare reușită! Vă rugăm să vă autentificați.",
+          type: "success",
+        });
+
         await signOut(auth);
         console.log("Utilizator delogat după înregistrare");
 
-        alert("Înregistrare reușită! Vă rugăm să vă autentificați pentru a continua.");
         this.$router.push("/login");
         } catch (error) {
           console.error("Eroare la înregistrare:", error.message);
           this.errorMessage = "Eroare: " + error.message;
+
+          this.showNotification( {
+          message: "Eroare la înregistrare: " + error.message,
+          type: "error",
+        });
         }
       },
     },
@@ -104,5 +118,9 @@ export default {
 <style scoped>
 .form-container {
   margin-bottom: 100px;
+}
+
+.error {
+  color: red;
 }
 </style>

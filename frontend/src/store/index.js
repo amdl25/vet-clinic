@@ -10,6 +10,11 @@ export const store = createStore({
   state: {
     user: null,
     services: [],
+    appointments: [],
+    notification: {
+      message: "",
+      type: "",
+    }
   },
   mutations: {
     setUser(state, user) {
@@ -20,6 +25,16 @@ export const store = createStore({
     },
     setServices(state, services) {
       state.services = services;
+    },
+    setNotification(state, notification) {
+      state.notification.message = notification.message;
+      state.notification.type = notification.type;
+    },    
+    clearNotification(state) {
+      state.notification = { message: "", type: "" };
+    },
+    setAppointments(state, appointments) {
+      state.appointments = appointments;
     },
   },
   actions: {
@@ -69,7 +84,7 @@ export const store = createStore({
       }
     },
 
-    async fetchAppointments({ state }) {
+    async fetchAppointments({ commit }) {
       try {
         const auth = getAuth(firebaseApp);
         const user = auth.currentUser;
@@ -83,6 +98,7 @@ export const store = createStore({
           },
         });
 
+        commit("setAppointments", response.data);
         return response.data;
       } catch (error) {
         console.error("Eroare la obținerea programărilor:", error);
@@ -102,6 +118,15 @@ export const store = createStore({
         console.error("Eroare la salvarea utilizatorului în baza de date:", error.message);
       }
     },
+
+    showNotification({ commit }, { message, type }) {
+      console.log("Notificare trimisă:", { message, type });
+      commit("setNotification", { message, type });
+
+      setTimeout(() => {
+        commit("clearNotification");
+      }, 20000);
+    },
   },
   getters: {
     isAuthenticated(state) {
@@ -112,6 +137,12 @@ export const store = createStore({
     },
     getServices(state) {
       return state.services;
+    },
+    notification(state) {
+      return state.notification;
+    },
+    getAppointments(state) {
+      return state.appointments || [];
     },
   },
 });
