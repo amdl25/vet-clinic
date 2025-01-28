@@ -8,8 +8,9 @@
         type="text"
         v-model="username"
         placeholder="Introduceți numele și prenumele"
-        required
+        @blur="validateField('username')"
       />
+      <p v-if="errors.username" class="error">{{ errors.username }}</p>
 
       <label for="email">Email:</label>
       <input
@@ -17,8 +18,9 @@
         type="email"
         v-model="email"
         placeholder="Introduceți adresa de email"
-        required
+        @blur="validateField('email')"
       />
+      <p v-if="errors.email" class="error">{{ errors.email }}</p>
 
       <label for="phone">Telefon:</label>
       <input
@@ -26,8 +28,9 @@
         type="tel"
         v-model="phone"
         placeholder="Introduceți numărul de telefon"
-        required
+        @blur="validateField('phone')"
       />
+      <p v-if="errors.phone" class="error">{{ errors.phone }}</p>
 
       <label for="password">Parolă:</label>
       <input
@@ -35,12 +38,13 @@
         type="password"
         v-model="password"
         placeholder="Introduceți parola"
-        required
+        @blur="validateField('password')"
       />
+      <p v-if="errors.password" class="error">{{ errors.password }}</p>
 
       <button type="submit">Înregistrare</button>
     </form>
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    <p v-if="errors.submit" class="error">{{ errors.submit }}</p>
     <p>
       Aveți deja un cont? <router-link to="/login">Autentificați-vă aici</router-link>
     </p>
@@ -65,12 +69,62 @@ export default {
       email: "",
       phone: "",
       password: "",
-      errorMessage: "",
+      errors: {},
     };
   },
   methods: {
     ...mapActions(["showNotification"]),
+    validateField(field) {
+      this.errors[field] = "";
+
+      switch (field) {
+        case "username":
+          if (!this.username) {
+            this.errors.username = "Numele este obligatoriu.";
+          } else if (this.username.length < 3) {
+            this.errors.username = "Numele trebuie să aibă cel puțin 3 caractere.";
+          }
+          break;
+
+        case "email":
+          if (!this.email) {
+            this.errors.email = "Adresa de email este obligatorie.";
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+            this.errors.email = "Introduceți o adresă de email validă.";
+          }
+          break;
+
+        case "phone":
+          const phoneRegex = /^[0-9]{10}$/;
+          if (!this.phone) {
+            this.errors.phone = "Numărul de telefon este obligatoriu.";
+          } else if (!phoneRegex.test(this.phone)) {
+            this.errors.phone = "Introduceți un număr de telefon valid (10 cifre).";
+          }
+          break;
+
+        case "password":
+          if (!this.password) {
+            this.errors.password = "Parola este obligatorie.";
+          } else if (this.password.length < 6) {
+            this.errors.password = "Parola trebuie să aibă cel puțin 6 caractere.";
+          }
+          break;
+
+        default:
+          break;
+      }
+    },
+
     async register() {
+      this.errors = {};
+
+      ['username', 'email', 'phone', 'password'].forEach((field) => this.validateField(field));
+
+      if (Object.keys(this.errors).some((key) => this.errors[key])) {
+        return;
+      }
+
       const auth = getAuth(firebaseApp);
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
@@ -102,10 +156,14 @@ export default {
         this.$router.push("/login");
         } catch (error) {
           console.error("Eroare la înregistrare:", error.message);
-          this.errorMessage = "Eroare: " + error.message;
+
+          const errorMessages = {
+          "auth/email-already-in-use": "Adresa de email introdusă este deja asociată unui cont existent.",
+          };
+          this.errors.submit = errorMessages[error.code] || "A apărut o eroare. Te rugăm să încerci din nou.";
 
           this.showNotification( {
-          message: "Eroare la înregistrare: " + error.message,
+          message: "Înregistrarea a eșuat.",
           type: "error",
         });
         }
@@ -121,6 +179,11 @@ export default {
 }
 
 .error {
-  color: red;
+  color: rgb(255, 99, 71);
+  font-size: 10px;
+  font-style: italic;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 </style>

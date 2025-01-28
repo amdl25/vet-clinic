@@ -2,7 +2,24 @@ import { admin, db } from '../../db_config/firebaseSDK.js';
 
 const saveUser = async (req, res) => {
   try {
-    const { uid, name, email, phone, appointments } = req.body;
+    const { name, email, phone, appointments } = req.body;
+
+    if (!name || name.trim().length < 3) {
+      return res.status(400).json({ message: "Numele este obligatoriu și trebuie să aibă cel puțin 3 caractere." });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return res.status(400).json({ message: "Adresa de email este obligatorie și trebuie să fie validă." });
+    }
+
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phone || !phoneRegex.test(phone)) {
+      return res.status(400).json({ message: "Numărul de telefon este obligatoriu și trebuie să conțină exact 10 cifre." });
+    }
+
+
+    const uid = req.user.uid;
   
     const userRef = db.collection('users').doc(uid);
     await userRef.set({

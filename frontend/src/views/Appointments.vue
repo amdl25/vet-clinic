@@ -39,7 +39,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['isAuthenticated', 'getServices', "appointments"]),
+    ...mapGetters(['isAuthenticated', 'getServices']),
     getServiceName() {
       return (serviceId) => {
         const service = this.getServices.find((s) => s.id === serviceId);
@@ -78,56 +78,56 @@ export default {
 </script>
 
 <style scoped>
-.appointments-history {
-  margin-bottom: 80px;
-  padding: 10px;
-  list-style-type: none;
-}
-
-.appointment-item {
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 768px) {
   .appointments-history {
-    padding: 5px;
-  }
-
-  .appointment-item {
-    margin-bottom: 15px;
+    margin-bottom: 80px;
     padding: 10px;
-    font-size: 14px;
-  }
-
-  strong {
-    display: block;
-    font-size: 16px;
-    margin-bottom: 5px;
-  }
-}
-
-
-@media (min-width: 1024px) {
-  .appointments-history {
-    max-width: 800px;
-    margin: 0 auto 80px auto;
+    list-style-type: none;
   }
 
   .appointment-item {
-    margin-bottom: 25px;
-    padding: 20px;
-    font-size: 18px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  strong {
-    display: block;
-    font-size: 20px;
-    margin-bottom: 8px;
+  @media (max-width: 768px) {
+    .appointments-history {
+      padding: 5px;
+    }
+
+    .appointment-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
   }
-}
+
+
+  @media (min-width: 1024px) {
+    .appointments-history {
+      max-width: 800px;
+      margin: 0 auto 80px auto;
+    }
+
+    .appointment-item {
+      margin-bottom: 25px;
+      padding: 20px;
+      font-size: 18px;
+    }
+
+    strong {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+  }
 </style>
