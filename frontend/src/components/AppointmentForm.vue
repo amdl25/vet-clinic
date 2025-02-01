@@ -66,7 +66,7 @@ export default {
 
 
     validateField(field) {
-      this.errors[field] = "";
+      delete this.errors[field];
 
       switch (field) {
         case "name":
@@ -128,20 +128,32 @@ export default {
       Object.keys(this.form).forEach((field) => this.validateField(field))
 
       if (Object.keys(this.errors).length === 0) {
-
         try {
-          const token = this.getUser.token; 
+          const token = this.getUser ? this.getUser.token : null;; 
           const appointmentData = {
             ...this.form,
             userId: this.getUser ? this.getUser.uid : null,
           };
 
           await this.addAppointment({ appointmentData, token });
-          await this.fetchAppointments();
+          if(this.getUser) {
+            await this.fetchAppointments();
+          }
+
+          this.form = {
+            name: "",
+            pet: "",
+            serviceId: "",
+            date: "",
+            timeInterval: "",
+            phone: "",
+          };
+          
           this.showNotification({
             message: "Programarea a fost creată cu succes!",
             type: "success",
           });
+
         }catch (error) {
           console.error('Eroare la trimiterea programării:', error);
           

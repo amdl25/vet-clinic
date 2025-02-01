@@ -1,4 +1,4 @@
-import { db } from '../../db_config/firebaseSDK.js';
+import { db, admin } from '../../db_config/firebaseSDK.js';
 import { addAppointmentToUser } from './usersController.js';
 
 const createAppointment = async (req, res) => {
@@ -79,4 +79,61 @@ const getAppointments = async (req, res) => {
     }
 };
 
-export { createAppointment, getAppointments };
+const updateAppointment = async (req, res) => {
+  try {
+    const { date, timeInterval } = req.body;
+
+    if (!date || !timeInterval) {
+      return res.status(400).json({ message: "Toate câmpurile sunt obligatorii." });
+    }
+
+    const appointmentRef = db.collection("appointments").doc(req.params.id);
+
+    const updatedData = {};
+    updatedData.date = date;
+    updatedData.timeInterval = timeInterval;
+    updatedData["metadata.updatedAt"] = new Date().toISOString();
+
+    await appointmentRef.update(updatedData);
+
+    return res.status(200).json({ message: "Programarea a fost actualizată cu succes." });
+  } catch (error) {
+    console.error("Eroare la actualizarea programării:", error);
+    return res.status(500).json({ message: "Eroare la actualizarea programării", error });
+  }
+};
+
+const deleteAppointment = async (req, res) => {
+  try {
+    const appointmentId = req.params.id;
+    
+    const appointmentRef = db.collection("appointments").doc(appointmentId);
+    const appointmentDoc = await appointmentRef.get();
+
+    if (!appointmentDoc.exists) {
+      return res.status(404).json({ message: "Programarea nu a fost găsită." });
+    }
+
+    const appointmentData = appointmentDoc.data();
+
+    if (appointmentData.userId !== req.user.uid) {
+      return res.status(403).json({ message: "Nu ai permisiunea de a anula această programare." });
+    }
+
+    await appointmentRef.delete();
+
+    const userRef = db.collection("users").doc(req.user.uid);
+    await userRef.update({
+      appointments: admin.firestore.FieldValue.arrayRemove(appointmentId),
+    });
+
+    console.log(` Programare ${appointmentId} eliminată pentru user: ${req.user.uid}`);
+
+    return res.status(200).json({ message: "Programarea a fost anulată cu succes." });
+  } catch (error) {
+    console.error("Eroare la anularea programării:", error);
+    return res.status(500).json({ message: "Eroare la anularea programării", error });
+  }
+};
+
+export { createAppointment, getAppointments, updateAppointment, deleteAppointment };

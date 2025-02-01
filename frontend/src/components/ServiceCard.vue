@@ -23,14 +23,24 @@ export default {
   border: 1px solid #ccc;
   padding: 10px;
   margin: 10px 0;
-  border-radius: 5px;
+  border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   width: 200px;
   text-align: center;
+  background-color: #f4f0ff;
 }
 
 .card h2 {
   margin-bottom: 10px;
+}
+
+.card p {
+  font-style: italic;
+  font-weight: 200;
+}
+
+.card:hover {
+  background: rgba(230, 57, 70, 0.1);
 }
 
 

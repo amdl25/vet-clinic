@@ -36,6 +36,9 @@ export const store = createStore({
     setAppointments(state, appointments) {
       state.appointments = appointments;
     },
+    removeAppointment(state, appointmentId) {
+      state.appointments = state.appointments.filter(app => app.id !== appointmentId);
+    },
   },
   actions: {
     initializeAuth({ commit }) {
@@ -106,6 +109,60 @@ export const store = createStore({
       }
     },
 
+    async updateAppointment({ dispatch }, { appointmentId, updatedData }) {
+      try {
+        const auth = getAuth(firebaseApp);
+        const token = await auth.currentUser.getIdToken();
+
+        await axios.put(`http://localhost:3000/api/appointments/${appointmentId}`, updatedData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        await dispatch("fetchAppointments");
+
+        dispatch("showNotification",{
+          message: "Programarea a fost modificată cu succes!",
+          type: "success",
+        });
+
+      } catch (error) {
+        console.error("Eroare la actualizarea programării:", error);
+        dispatch("showNotification",{
+          message: "Eroare la actualizarea programării!",
+          type: "error",
+        });
+      }
+    },
+
+    async cancelAppointment({ commit, dispatch }, appointmentId) {
+      try {
+        const auth = getAuth(firebaseApp);
+        const token = await auth.currentUser.getIdToken();
+
+        await axios.delete(`http://localhost:3000/api/appointments/${appointmentId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        commit("removeAppointment", appointmentId);
+        await dispatch("fetchAppointments");
+        dispatch("showNotification", {
+            message: "Programarea a fost anulată cu succes!",
+            type: "success",
+        });
+
+      } catch (error) {
+        console.error("Eroare la anularea programării:", error);
+        dispatch("showNotification", {
+          message: "Eroare la anularea programării!",
+          type: "error",
+        });
+      }
+    },
+
     async saveUserToDatabase(_, user) {
       try {
         const response = await axios.post('http://localhost:3000/api/users', user, {
@@ -119,6 +176,29 @@ export const store = createStore({
       }
     },
 
+    async sendMessage({ dispatch }, formData) {
+      try {
+        console.log("Se trimite mesajul:", formData);
+    
+        const response = await axios.post("http://localhost:3000/api/contact", formData);
+    
+        console.log("Răspuns backend:", response.data);
+    
+        dispatch("showNotification", {
+          message: "Mesajul a fost trimis cu succes!",
+          type: "success",
+        });
+    
+      } catch (error) {
+        console.error("Eroare la trimiterea mesajului:", error);
+    
+        dispatch("showNotification", {
+          message: "Eroare la trimiterea mesajului. Încercați din nou.",
+          type: "error",
+        });
+      }
+    },
+    
     showNotification({ commit }, { message, type }) {
       console.log("Notificare trimisă:", { message, type });
       commit("setNotification", { message, type });

@@ -40,13 +40,13 @@ export default {
     transition: opacity 0.3s ease, transform 0.3s ease;
   }
   .notification.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background-color: #6A0DAD;
+    color: white;
+    border: 1px solid #6A0DAD
   }
   .notification.error {
     background-color: #f8d7da;
-    color: #721c24;
+    color: #E63946;
     border: 1px solid #f5c6cb;
   }
   .notification.info {

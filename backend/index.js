@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import servicesRoutes from './routes/servicesRoutes.js';
 import appointmentsRoutes from './routes/appointmentsRoutes.js';
 import usersRoutes from './routes/usersRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 app.use('/api/services', servicesRoutes);
 app.use('/api/appointments', appointmentsRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
