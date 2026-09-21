@@ -38,7 +38,7 @@ populateServices.js    seeds the services collection in Firestore
 
 ### Firebase setup
 1. Put your project's web configuration in `db_config/firebaseConfig.js`.
-2. In the Firebase console, go to Project settings, then Service accounts, and generate a private key. Save it as `db_config/serviceAccountKey.json`. This file is ignored by git, never commit it.
+2. In the Firebase console, go to Project settings, then Service accounts, and generate a private key. Save it as `db_config/serviceAccountKey.json`.
 
 ### Install and seed
 
